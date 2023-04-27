@@ -1,8 +1,9 @@
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
-// const inputDataPicker = document.getElementById('datetime-picker');
 const btnStart = document.querySelector('button[data-start]');
+const timerDiv = document.querySelector('.timer');
+const field = document.getElementsByClassName('field');
 const timeDays = document.querySelector('span[data-days]')
 const timeHours = document.querySelector('span[data-hours]')
 const timeMinutes = document.querySelector('span[data-minutes]')
@@ -27,23 +28,70 @@ const options = {
 
 flatpickr("#datetime-picker", options);
 
+const timers = function() {
+	isActive: false;
+	if(this.isActive) {
+		return;
+	}
+	const endTime = selectTime || (Date.now() + 1000 * 60 * 60 * 24);
+	this.isActive = true;
+ 
+	const intervalId = setInterval(() => {
+	  const timeLeft = endTime - Date.now();
+	  if (timeLeft <= 0) {
+		 clearInterval(intervalId);
+	  } else {
+		 const time = convertMs(timeLeft);
+
+		 textTimers(time)
+		 console.log(time);
+	  }
+	}, 1000);
+ }
+
+btnStart.addEventListener('click', timers);
 
 
-//  function convertMs(ms) {
-// 	// Number of milliseconds per unit of time
-// 	const second = 1000;
-// 	const minute = second * 60;
-// 	const hour = minute * 60;
-// 	const day = hour * 24;
+// Функція яка буле перед числом добавляти - 0;
+function pad(value) {
+	return String(value).padStart(2, '0');
+}
+
+ function convertMs(ms) {
+	// Number of milliseconds per unit of time
+	const second = 1000;
+	const minute = second * 60;
+	const hour = minute * 60;
+	const day = hour * 24;
  
-// 	// Remaining days
-// 	const days = Math.floor(ms / day);
-// 	// Remaining hours
-// 	const hours = Math.floor((ms % day) / hour);
-// 	// Remaining minutes
-// 	const minutes = Math.floor(((ms % day) % hour) / minute);
-// 	// Remaining seconds
-// 	const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+	// Remaining days
+	const days = pad(Math.floor(ms / day));
+	// Remaining hours
+	const hours = pad(Math.floor((ms % day) / hour));
+	// Remaining minutes
+	const minutes = pad(Math.floor(((ms % day) % hour) / minute));
+	// Remaining seconds
+	const seconds = pad(Math.floor((((ms % day) % hour) % minute) / second));
  
-// 	return { days, hours, minutes, seconds };
-//  }
+	return { days, hours, minutes, seconds };
+ }
+
+// Виводимо час:
+function textTimers({ days, hours, minutes, seconds }) {
+	timeDays.textContent = `${days}`;
+	timeHours.textContent = `${hours}`;
+	timeMinutes.textContent = `${minutes}`;
+	timeSeconds.textContent = `${seconds}`;
+}
+
+//  стилізація
+timerDiv.style.marginTop = '25px';
+timerDiv.style.display = 'flex';
+timerDiv.style.gap = '30px';
+
+for(let i = 0; i < field.length ; i++) {
+	field[i].style.display = 'flex';
+	field[i].style.flexDirection = 'column';
+	field[i].style.alignItems = 'center';
+	field[i].style.textTransform = 'uppercase';
+}
